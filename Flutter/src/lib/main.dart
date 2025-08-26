@@ -35,27 +35,108 @@ class MyAppState extends ChangeNotifier {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+
+  @override
+  Widget build(BuildContext context) {
+    Widget page; // ← Nuevo witget para asignar una pantalla
+    switch (selectedIndex) {
+      case 0:
+        page = GeneratorPage();
+        break;
+      case 1:
+        page = FavoritesPage();
+        break;
+      default:
+        throw UnimplementedError('no widget for $selectedIndex');
+    }
+
+    return LayoutBuilder(builder: (context, constraints) {
+        return Scaffold(
+          body: Row(
+            children: [
+              SafeArea(
+                child: NavigationRail(
+                  extended: constraints.maxWidth >= 600,  // ← Volver resposive.
+                  destinations: [
+                    NavigationRailDestination(
+                      icon: Icon(Icons.home),
+                      label: Text('Home'),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.favorite),
+                      label: Text('Favorites'),
+                    ),
+                  ],
+        
+        
+                  onDestinationSelected: (value) {
+                    // ↓ mostrar el valor seleccionado.
+                    setState(() {
+                      selectedIndex = value;
+                    });
+                  },
+                ),
+              ),
+              Expanded(
+                child: Container(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  child: page,  // ← Llamado a la nueva pagina.
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+    );
+  }
+}
+
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     var pair = appState.current;                 // ← Add this.
+class GeneratorPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    var pair = appState.current; // ← Add this.
+
 
     return Scaffold(
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,  // ← Centrado
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text('Hellow Word Movil :)'),
-            BigCad(pair: pair), 
-        
-            // ↓ Add this.
-            ElevatedButton(
-              onPressed: () {
-                appState.getNext(); // ← Cambio por print().
-              },
-              child: Text('Next'),
-            ),
+            BigCad(pair: pair),
+            SizedBox(height: 10),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // ↓ Add Like.
+                ElevatedButton.icon(
+                  onPressed: () {
+                    appState.toggleFavorite();
+                  },
+                  icon: Icon(icon),
+                  label: Text('Like'),
+                ),
+                SizedBox(width: 10),
+
+                ElevatedButton(
+                  onPressed: () {
+                    appState.getNext();
+                  },
+                  child: Text('Next'),
+                ),
+              ],
+            )
           ],
         ),
       ),
@@ -73,19 +154,20 @@ class BigCad extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);       // ← Add this.
+    final theme = Theme.of(context); // ← Add this.
     // ↓ Add this.
     final style = theme.textTheme.displayMedium!.copyWith(
       color: theme.colorScheme.onPrimary,
     );
 
     return Card(
-      color: theme.colorScheme.primary,    // ← Color
+      color: theme.colorScheme.primary, // ← Color
       child: Padding(
         padding: const EdgeInsets.all(20),
-         // ↓ Agregar Estilos
+        // ↓ Agregar Estilos
         child: Text(pair.asLowerCase, style: style),
       ),
     );
   }
 }
+
