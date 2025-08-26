@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
         title: 'Namer App',
         theme: ThemeData(
           useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlue),
         ),
         home: MyHomePage(),
       ),
@@ -27,6 +27,12 @@ class MyApp extends StatelessWidget {
 
 class MyAppState extends ChangeNotifier {
   var current = WordPair.random();
+
+  // ↓ Generar palabras Aleatorias.
+  void getNext() {
+    current = WordPair.random();
+    notifyListeners();
+  }
 }
 
 class MyHomePage extends StatelessWidget {
@@ -39,6 +45,14 @@ class MyHomePage extends StatelessWidget {
         children: [
           Text('A random idea:'),
           Text(appState.current.asLowerCase),
+
+          // ↓ Add this.
+          ElevatedButton(
+            onPressed: () {
+               appState.getNext();  // ← obtener texto.
+            },
+            child: Text('Next'),
+          ),
         ],
       ),
     );
